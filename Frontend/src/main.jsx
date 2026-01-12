@@ -11,6 +11,7 @@ createRoot(document.getElementById('root')).render(
       <App />
     </Provider>
   </StrictMode>,
+  
 )
 // Register Service Worker for PWA
 if ('serviceWorker' in navigator) {
