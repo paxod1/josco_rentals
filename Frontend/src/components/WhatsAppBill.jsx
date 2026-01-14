@@ -109,7 +109,7 @@ Balance: ${formatCurrency(productBalance)}`;
             returnTransactions.forEach((returnTx, index) => {
                 const returnDate = formatDate(returnTx.date);
                 const product = rental.productItems.find(item =>
-                    (item.productId._id || item.productId).toString() === returnTx.productId.toString()
+                    (item.productId?._id || item.productId || '').toString() === returnTx.productId.toString()
                 );
                 const productName = product ? product.productName : 'Unknown Product';
 
@@ -131,7 +131,7 @@ Balance: ${formatCurrency(productBalance)}`;
             additionalRentals.forEach((addTx, index) => {
                 const addDate = formatDate(addTx.date);
                 const product = rental.productItems.find(item =>
-                    (item.productId._id || item.productId).toString() === addTx.productId.toString()
+                    (item.productId?._id || item.productId || '').toString() === addTx.productId.toString()
                 );
                 const productName = product ? product.productName : 'Unknown Product';
 
@@ -153,7 +153,7 @@ Balance: ${formatCurrency(productBalance)}`;
                     // Add product name if specific payment
                     if (payment.productId) {
                         const product = rental.productItems.find(item =>
-                            (item.productId._id || item.productId).toString() === payment.productId.toString()
+                            (item.productId?._id || item.productId || '').toString() === payment.productId.toString()
                         );
                         if (product) {
                             paymentInfo += `
@@ -238,7 +238,7 @@ We appreciate your business and look forward to serving you again.`;
         // Otherwise calculate from transactions
         if (!rental || !rental.transactions) return productItem.amount || 0;
 
-        const productId = productItem.productId._id || productItem.productId;
+        const productId = productItem.productId?._id || productItem.productId;
 
         const productPayments = rental.payments?.filter(payment =>
             payment.productId && payment.productId.toString() === productId.toString()
@@ -260,7 +260,7 @@ We appreciate your business and look forward to serving you again.`;
         transactions.forEach(transaction => {
             // Find product name for transaction
             const productItem = rental.productItems.find(item =>
-                (item.productId._id || item.productId).toString() === transaction.productId?.toString()
+                (item.productId?._id || item.productId || '').toString() === transaction.productId?.toString()
             );
 
             activities.push({
@@ -278,7 +278,7 @@ We appreciate your business and look forward to serving you again.`;
         payments.forEach(payment => {
             // Find product name for payment if applicable
             const productItem = payment.productId ? rental.productItems.find(item =>
-                (item.productId._id || item.productId).toString() === payment.productId.toString()
+                (item.productId?._id || item.productId || '').toString() === payment.productId.toString()
             ) : null;
 
             activities.push({

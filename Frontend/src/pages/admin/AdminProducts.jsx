@@ -131,7 +131,8 @@ function AdminProducts() {
       dispatch(closeDeleteModal());
     } catch (error) {
       console.error("Error deleting product:", error);
-      dispatch(showToast({ message: "Error deleting product", type: "error" }));
+      const errorMessage = error.response?.data?.message || "Error deleting product";
+      dispatch(showToast({ message: errorMessage, type: "error" }));
       dispatch(setDeleteModalLoading(false));
     }
   };

@@ -966,13 +966,17 @@ function RentalHistory() {
                             <p className="text-xs sm:text-sm font-medium text-gray-600">Financials</p>
                             <div className="text-sm sm:text-base">
                               <p>Amt: ₹{item.amount || 0}</p>
-                              {selectedRental.discountInfo?.productDiscounts?.find(d =>
-                                (d.productId._id || d.productId) === (item.productId?._id || item.productId)
-                              )?.discount > 0 && (
+                              {selectedRental.discountInfo?.productDiscounts?.find(d => {
+                                const dId = d.productId ? (d.productId._id || d.productId).toString() : null;
+                                const iId = item.productId ? (item.productId._id || item.productId).toString() : null;
+                                return dId && iId && dId === iId;
+                              })?.discount > 0 && (
                                   <p className="text-orange-600 text-xs">
-                                    Disc: -₹{selectedRental.discountInfo.productDiscounts.find(d =>
-                                      (d.productId._id || d.productId) === (item.productId?._id || item.productId)
-                                    ).discount}
+                                    Disc: -₹{selectedRental.discountInfo.productDiscounts.find(d => {
+                                      const dId = d.productId ? (d.productId._id || d.productId).toString() : null;
+                                      const iId = item.productId ? (item.productId._id || item.productId).toString() : null;
+                                      return dId && iId && dId === iId;
+                                    })?.discount}
                                   </p>
                                 )}
                             </div>
