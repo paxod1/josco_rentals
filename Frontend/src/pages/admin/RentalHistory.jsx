@@ -28,6 +28,7 @@ import axiosInstance from "../../../axiosCreate";
 import Pagination from "../../components/global/Pagination";
 import WhatsAppBill from "../../components/WhatsAppBill";
 import CustomDropdown from "../../components/commonComp/CustomDropdown";
+import { getPageAfterDelete } from "../../utils/paginationHelpers";
 
 function RentalHistory() {
   const dispatch = useDispatch();
@@ -216,7 +217,17 @@ function RentalHistory() {
 
     setIsDeleting(true);
     try {
+      // Calculate the page to navigate to after deletion
+      // For server-side pagination, we use totalRentals from the server
+      const newPage = getPageAfterDelete(currentPage, totalRentals, 5); // 5 is the limit per page
+
       await axiosInstance.delete(`/api/rentals/${rentalToDelete._id}`);
+
+      // Update page before fetching if needed
+      if (newPage !== currentPage) {
+        setCurrentPage(newPage);
+      }
+
       dispatch(showToast({ message: "Rental record deleted successfully!", type: "success" }));
       closeDeleteModal();
       fetchRentalHistory(false);

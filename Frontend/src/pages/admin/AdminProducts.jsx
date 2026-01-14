@@ -9,6 +9,7 @@ import axiosInstance from "../../../axiosCreate";
 import LoadingSpinner from "../../components/commonComp/LoadingSpinner";
 import Pagination from "../../components/global/Pagination";
 import CustomDropdown from "../../components/commonComp/CustomDropdown";
+import { getPageAfterDelete } from "../../utils/paginationHelpers";
 
 function AdminProducts() {
   const dispatch = useDispatch();
@@ -125,7 +126,17 @@ function AdminProducts() {
   const handleDelete = async (id) => {
     try {
       dispatch(setDeleteModalLoading(true));
+
+      // Calculate the page to navigate to after deletion
+      const newPage = getPageAfterDelete(currentPage, products.length, itemsPerPage);
+
       await axiosInstance.delete(`/api/products/${id}`);
+
+      // Update page before fetching if needed
+      if (newPage !== currentPage) {
+        setCurrentPage(newPage);
+      }
+
       await fetchProducts(false);
       dispatch(showToast({ message: "Product deleted successfully!", type: "success" }));
       dispatch(closeDeleteModal());
