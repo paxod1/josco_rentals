@@ -30,14 +30,14 @@
 
   <!-- Automatic Recovery Script for "Blank Screen" Issues -->
   <script>
-    (function() {
+    (function () {
       // Config
       const RECOVERY_TIMEOUT = 6000; // 6 seconds
       const COOKIES_TO_CLEAR = ['authToken', 'user'];
-      
+
       function clearAndReload(reason) {
         console.error('CRITICAL: App recovery triggered. Reason:', reason);
-        
+
         // 1. Clear Cookies
         COOKIES_TO_CLEAR.forEach(name => {
           document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
@@ -48,7 +48,7 @@
         try {
           localStorage.clear();
           sessionStorage.clear();
-        } catch (e) {}
+        } catch (e) { }
 
         // 3. Unregister Service Workers
         if ('serviceWorker' in navigator) {
@@ -56,7 +56,7 @@
             for (let registration of registrations) {
               registration.unregister();
             }
-          }).catch(() => {});
+          }).catch(() => { });
         }
 
         // 4. Reload to /login or root
@@ -72,17 +72,16 @@
       window.__MAIN_BUNDLE_LOADED__ = false;
 
       // Listen for script/asset loading errors
-      window.addEventListener('error', function(e) {
+      window.addEventListener('error', function (e) {
         if (e.target && (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK')) {
           const src = e.target.src || e.target.href;
-          if (src && src.includes('/assets/')) {
-            clearAndReload('Asset loading failed (MIME type or 404): ' + src);
-          }
+          // Trigger recovery for any script/link failure on the live site
+          clearAndReload('Asset loading failed (MIME type or 404): ' + src);
         }
       }, true);
 
       // Check for mount failure after timeout
-      setTimeout(function() {
+      setTimeout(function () {
         const root = document.getElementById('root');
         if (!window.__MAIN_BUNDLE_LOADED__ || (root && root.innerHTML === '')) {
           // If the URL already has recovered=true, don't reload again to prevent loops

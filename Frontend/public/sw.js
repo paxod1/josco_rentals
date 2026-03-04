@@ -1,13 +1,11 @@
-const CACHE_NAME = 'josco-hiring-centre-v1';
+const CACHE_NAME = 'josco-hiring-centre-v2';
 const urlsToCache = [
-    '/',
-    '/index.html',
     '/manifest.json'
 ];
 
 // Install a service worker
 self.addEventListener('install', event => {
-    // Perform install steps
+    self.skipWaiting(); // Force the waiting service worker to become the active service worker
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
@@ -21,18 +19,17 @@ self.addEventListener('fetch', event => {
     event.respondWith(
         caches.match(event.request)
             .then(response => {
-                // Cache hit - return response
                 if (response) {
                     return response;
                 }
                 return fetch(event.request);
-            }
-            )
+            })
     );
 });
 
 // Update a service worker
 self.addEventListener('activate', event => {
+    event.waitUntil(clients.claim()); // Become available to all pages immediately
     const cacheWhitelist = [CACHE_NAME];
     event.waitUntil(
         caches.keys().then(cacheNames => {
