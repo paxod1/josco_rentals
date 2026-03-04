@@ -39,10 +39,14 @@
         console.error('CRITICAL: App recovery triggered. Reason:', reason);
 
         // 1. Clear Cookies
-        COOKIES_TO_CLEAR.forEach(name => {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i];
+          const eqPos = cookie.indexOf("=");
+          const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
           document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
           document.cookie = name + '=; Path=/; Domain=' + window.location.hostname + '; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-        });
+        }
 
         // 2. Clear LocalStorage & SessionStorage
         try {
@@ -59,12 +63,10 @@
           }).catch(() => { });
         }
 
-        // 4. Reload to /login or root
-        // We add a param to prevent infinite reload loops if the server itself is down
-        const url = new URL(window.location.origin);
+        // 4. Redirect to /login
+        // We add a param to prevent infinite reload loops
         if (!window.location.search.includes('recovered=true')) {
-          url.searchParams.set('recovered', 'true');
-          window.location.replace(url.href);
+          window.location.replace('/login?recovered=true');
         }
       }
 
