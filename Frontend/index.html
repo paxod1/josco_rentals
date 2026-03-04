@@ -27,6 +27,72 @@
   <meta property="twitter:image" content="/pwa-source.jpg?v=2" />
 
   <title>JOSCO HIRING CENTRE</title>
+
+  <!-- Automatic Recovery Script for "Blank Screen" Issues -->
+  <script>
+    (function() {
+      // Config
+      const RECOVERY_TIMEOUT = 6000; // 6 seconds
+      const COOKIES_TO_CLEAR = ['authToken', 'user'];
+      
+      function clearAndReload(reason) {
+        console.error('CRITICAL: App recovery triggered. Reason:', reason);
+        
+        // 1. Clear Cookies
+        COOKIES_TO_CLEAR.forEach(name => {
+          document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+          document.cookie = name + '=; Path=/; Domain=' + window.location.hostname + '; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        });
+
+        // 2. Clear LocalStorage & SessionStorage
+        try {
+          localStorage.clear();
+          sessionStorage.clear();
+        } catch (e) {}
+
+        // 3. Unregister Service Workers
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(registrations => {
+            for (let registration of registrations) {
+              registration.unregister();
+            }
+          }).catch(() => {});
+        }
+
+        // 4. Reload to /login or root
+        // We add a param to prevent infinite reload loops if the server itself is down
+        const url = new URL(window.location.origin);
+        if (!window.location.search.includes('recovered=true')) {
+          url.searchParams.set('recovered', 'true');
+          window.location.replace(url.href);
+        }
+      }
+
+      // Track if main bundle loaded
+      window.__MAIN_BUNDLE_LOADED__ = false;
+
+      // Listen for script/asset loading errors
+      window.addEventListener('error', function(e) {
+        if (e.target && (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK')) {
+          const src = e.target.src || e.target.href;
+          if (src && src.includes('/assets/')) {
+            clearAndReload('Asset loading failed (MIME type or 404): ' + src);
+          }
+        }
+      }, true);
+
+      // Check for mount failure after timeout
+      setTimeout(function() {
+        const root = document.getElementById('root');
+        if (!window.__MAIN_BUNDLE_LOADED__ || (root && root.innerHTML === '')) {
+          // If the URL already has recovered=true, don't reload again to prevent loops
+          if (!window.location.search.includes('recovered=true')) {
+            clearAndReload('App failed to mount or bundle failed to execute');
+          }
+        }
+      }, RECOVERY_TIMEOUT);
+    })();
+  </script>
 </head>
 
 <body>
